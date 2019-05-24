@@ -6,12 +6,15 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -20,8 +23,10 @@ import javax.swing.Timer;
 public class FlappyBird extends JFrame {
 
 	JPanel panelP;
-	Timer time;
-	JLabel pipeUp1, pipeDown1, pipeUp2, pipeDown2, pipeUp3, pipeDown3, suelo;
+	Timer timePuls, timeSolt, timePipes;
+	JLabel pipeUp1, pipeDown1, pipeUp2, pipeDown2, pipeUp3, pipeDown3, suelo, bird;
+	JButton pulsar;
+	int contPulsar;
 
 	public FlappyBird() {
 		Toolkit miPantalla = Toolkit.getDefaultToolkit();
@@ -54,6 +59,11 @@ public class FlappyBird extends JFrame {
 		panelP.setVisible(true);
 		panelP.setLayout(null);
 		getContentPane().add(panelP);
+		
+		bird = new JLabel();
+		bird.setIcon(new ImageIcon("src\\pics\\bird.png"));
+		bird.setBounds(200, 240, 60, 42);
+		panelP.add(bird);
 		
 		suelo = new JLabel();
 		suelo.setIcon(new ImageIcon("src\\pics\\suelo.png"));
@@ -89,6 +99,49 @@ public class FlappyBird extends JFrame {
 		pipeDown3.setIcon(new ImageIcon("src\\pics\\pipe2.png"));
 		pipeDown3.setBounds(626, -200, 100, 450);
 		panelP.add(pipeDown3);
+		
+		pulsar = new JButton();
+		pulsar.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				posBirdPulsar();
+				if(pulsar.getModel().isArmed()) {
+					contPulsar++;
+				}
+				if(contPulsar >= 2)
+				timeSolt.stop();
+			}
+
+			public void mouseReleased(MouseEvent e) {
+				timePuls.stop();
+				posBirdSoltar();
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+		});
+		pulsar.setBounds(0, 0, 626, 682);
+		pulsar.setOpaque(false);
+		pulsar.setContentAreaFilled(false);
+		pulsar.setBorderPainted(false);
+		panelP.add(pulsar);
 
 		empezarJuego();
 	}
@@ -98,7 +151,7 @@ public class FlappyBird extends JFrame {
 	}
 
 	public void empezarJuego() {
-		time = new Timer(10, null);
+		timePipes = new Timer(10, null);
 		ActionListener listener = new ActionListener() {
 			int posInicial = 626;
 			int movimPipeUp1 = posInicial;
@@ -107,50 +160,85 @@ public class FlappyBird extends JFrame {
 			int movimPipeDown2 = posInicial + 300;
 			int movimPipeUp3 = posInicial + 600;
 			int movimPipeDown3 = posInicial + 600;
+			int yPipe1 = crearYPipesRandom();
+			int yPipe2 = crearYPipesRandom();
+			int yPipe3 = crearYPipesRandom();
+			
 			public void actionPerformed(ActionEvent e) {
 				
 				movimPipeUp1 -= 2;
-				pipeUp1.setBounds(movimPipeUp1, 300, 100, 450);
+				pipeUp1.setBounds(movimPipeUp1, yPipe1, 100, 450);
 				movimPipeDown1 -= 2;
-				pipeDown1.setBounds(movimPipeDown1, -250, 100, 450);
+				pipeDown1.setBounds(movimPipeDown1, (yPipe1-550), 100, 450);
 				
 				if(movimPipeUp1 == -300) {
 					movimPipeUp1 = posInicial;
 					movimPipeDown1 = posInicial;
+					yPipe1 = crearYPipesRandom();
 				}
 				
 				movimPipeUp2 -= 2;
-				pipeUp2.setBounds(movimPipeUp2, 300, 100, 450);
+				pipeUp2.setBounds(movimPipeUp2, yPipe2, 100, 450);
 				movimPipeDown2 -= 2;
-				pipeDown2.setBounds(movimPipeDown2, -250, 100, 450);
+				pipeDown2.setBounds(movimPipeDown2, (yPipe2-550), 100, 450);
 				
 				if(movimPipeUp2 == -300) {
 					movimPipeUp2 = posInicial;
 					movimPipeDown2 = posInicial;
+					 yPipe2 = crearYPipesRandom();
 				}
 				
 				movimPipeUp3 -= 2;
-				pipeUp3.setBounds(movimPipeUp3, 300, 100, 450);
+				pipeUp3.setBounds(movimPipeUp3, yPipe3, 100, 450);
 				movimPipeDown3 -= 2;
-				pipeDown3.setBounds(movimPipeDown3, -250, 100, 450);
+				pipeDown3.setBounds(movimPipeDown3, (yPipe3-550), 100, 450);
 				
 				if(movimPipeUp3 == -300) {
 					movimPipeUp3 = posInicial;
 					movimPipeDown3 = posInicial;
+					yPipe3 = crearYPipesRandom();
 				}
 			}
 
 		};
-		time.addActionListener(listener);
-		time.start();
+		timePipes.addActionListener(listener);
+		timePipes.start();
 	}
 	
 	public int crearYPipesRandom() {
-		int y1 = 50;
-		int y2 = 526;
+		int y1 = 100;
+		int y2 = 476;
  		int random = (int)Math.floor(Math.random()*(y1-(y2+1))+(y2));
 		
 		return random;
+	}
+	
+	public void posBirdPulsar(){
+		timePuls = new Timer(20, null);
+		ActionListener listener = new ActionListener() {
+			int posBirdUp = bird.getY();
+			public void actionPerformed(ActionEvent e) {
+				posBirdUp -= 5;
+				bird.setBounds(200, posBirdUp, 60, 42);;
+			}
+
+		};
+		timePuls.addActionListener(listener);
+		timePuls.start();
+	}
+	
+	public void posBirdSoltar(){
+		timeSolt = new Timer(20, null);
+		ActionListener listener = new ActionListener() {
+			int posBirdDown = bird.getY();
+			public void actionPerformed(ActionEvent e) {
+				posBirdDown += 5;
+				bird.setBounds(200, posBirdDown, 60, 42);;
+			}
+
+		};
+		timeSolt.addActionListener(listener);
+		timeSolt.start();
 	}
 
 }
